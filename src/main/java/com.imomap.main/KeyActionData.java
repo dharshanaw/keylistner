@@ -17,6 +17,11 @@ package com.imomap.main;
 
 public class KeyActionData {
     String keyCharactor;
+    String keyId;
+    Long keyPressedTime;
+    Long keyReleasedTime;
+    Long keyDuration;
+    String action;
 
     public String getKeyId() {
         return keyId;
@@ -26,8 +31,6 @@ public class KeyActionData {
         this.keyId = keyId;
     }
 
-    String keyId;
-    Long keyPressedTime;
 
     public String getKeyCharactor() {
         return keyCharactor;
@@ -61,7 +64,13 @@ public class KeyActionData {
         this.action = action;
     }
 
-    Long keyReleasedTime;
-    String action;
+    public Long getKeyDuration() {
+        return keyDuration;
+    }
+
+    public void setKeyDuration(Long keyDuration) {
+        this.keyDuration = keyDuration;
+    }
+
 
 }

@@ -6,7 +6,6 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -17,12 +16,15 @@ public class KeyListner implements NativeKeyListener {
     HashMap<String, KeyMapData> keyPressedEventMap;
     HashMap<String, KeyMapData> keyRelesedEventMap;
     HashMap<String, KeyMapData> keyTypedEventMap;
+    volatile HashMap<String, KeyActionData> resultMap;
     String uniqueID;
+    String currentKeyPressed;
 
     KeyListner() {
         keyPressedEventMap = new HashMap<String, KeyMapData>();
         keyRelesedEventMap = new HashMap<String, KeyMapData>();
         keyTypedEventMap = new HashMap<String, KeyMapData>();
+        resultMap = new HashMap<String, KeyActionData>();
 
     }
 
@@ -33,10 +35,10 @@ public class KeyListner implements NativeKeyListener {
         keyMapData.setAction(KeyActions.KEY_PRESSES.toString());
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
-        keyMapData.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        keyMapData.setTimestamp(System.currentTimeMillis());
+        currentKeyPressed = NativeKeyEvent.getKeyText(e.getKeyCode());
         this.getKeyAggrigatedInfo(keyMapData);
     }
-
 
     public void nativeKeyReleased(NativeKeyEvent e) {
         System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
@@ -44,10 +46,8 @@ public class KeyListner implements NativeKeyListener {
         keyMapData.setAction(KeyActions.KEY_RELEASED.toString());
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
-        keyMapData.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        keyMapData.setTimestamp(System.currentTimeMillis());
         this.getKeyAggrigatedInfo(keyMapData);
-
-
     }
 
     public void nativeKeyTyped(NativeKeyEvent e) {
@@ -56,7 +56,7 @@ public class KeyListner implements NativeKeyListener {
         keyMapData.setAction(KeyActions.KEY_TYPED.toString());
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
-        keyMapData.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        keyMapData.setTimestamp(System.currentTimeMillis());
         this.getKeyAggrigatedInfo(keyMapData);
 
     }
@@ -71,13 +71,40 @@ public class KeyListner implements NativeKeyListener {
         } else {
             return;
         }
+        Runnable task = () -> {
+            KeyActionData actionData = new KeyActionData();
+            System.out.println("Hello " + keyPressedEventMap.values().size());
+            Object[] uuidArray = keyPressedEventMap.keySet().toArray();
+            for (int a = 0; a <= uuidArray.length - 1; a++) {
+                KeyMapData keyPressedData = keyPressedEventMap.get(uuidArray[a].toString());
+                if (keyRelesedEventMap.containsKey(uuidArray[a].toString())) {
+                    KeyMapData keyRelesedData = keyRelesedEventMap.get(uuidArray[a].toString());
+                    actionData.setAction(keyPressedData.getAction());
+                    actionData.setKeyCharactor(keyPressedData.getKeyCharactor());
+                    actionData.setKeyId(keyPressedData.getKeyId());
+                    actionData.setKeyPressedTime(keyPressedData.getTimestamp());
+                    actionData.setKeyReleasedTime(keyRelesedData.getTimestamp());
+                    actionData.setKeyDuration(keyRelesedData.getTimestamp() - keyPressedData.getTimestamp());
+                    resultMap.put(uuidArray[a].toString(), actionData);
+                    keyPressedEventMap.remove(uuidArray[a].toString());
+                    keyRelesedEventMap.remove(uuidArray[a].toString());
+                }
+            }
+        };
+        if (currentKeyPressed == "Enter") {
 
+            task.run();
 
+            Thread thread = new Thread(task);
+            thread.start();
+
+            System.out.println("Done!");
+        }
     }
+
 
     public static void main(String[] args) {
 
-        HashMap<Integer, String> map = new HashMap<Integer, String>();
         try {
 
             GlobalScreen.registerNativeHook();
@@ -89,7 +116,6 @@ public class KeyListner implements NativeKeyListener {
             System.exit(1);
         }
 
-        //GlobalScreen.addNativeKeyListener();
         GlobalScreen.addNativeKeyListener(new KeyListner());
 
 

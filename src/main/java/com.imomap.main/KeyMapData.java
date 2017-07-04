@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 public class KeyMapData {
     String keyCharactor;
     String keyId;
-    Timestamp timestamp;
+    Long timestamp;
     String action;
 
     public String getAction() {
@@ -50,11 +50,11 @@ public class KeyMapData {
     }
 
 
-    public Timestamp getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
