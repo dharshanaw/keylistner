@@ -37,8 +37,8 @@ public class KeyAggregateInfoReader {
     public void analyzeEvent(HashMap<String, KeyActionData> resultMap)
     {
         KeyMapData keyMapData = new KeyMapData();
-        keyMapData.setAction(KeyActions.KEY_PRESSES.toString());
-        keyMapData.setTimestamp(System.currentTimeMillis());
+
+keyMapData.getAction();
 
 
     }
@@ -83,7 +83,7 @@ public class KeyAggregateInfoReader {
         count++;
 
 
-        inputHandler.send(new Object[]{currentKeyPressed});
+        inputHandler.send(new Object[]{});
         inputHandler.send(new Object[]{"S", 75.6f, 100, System.currentTimeMillis()});
         inputHandler.send(new Object[]{"Backspace", 75.6f, 100, System.currentTimeMillis()});
         inputHandler.send(new Object[]{"E", 55.6f, 100, System.currentTimeMillis()});
