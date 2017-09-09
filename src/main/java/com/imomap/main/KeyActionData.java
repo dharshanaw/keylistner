@@ -15,6 +15,10 @@
  */
 package com.imomap.main;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class KeyActionData {
     String keyCharactor;
     String keyId;
@@ -22,7 +26,8 @@ public class KeyActionData {
     Long keyReleasedTime;
     Long keyDuration;
     String action;
-
+     Set<String> spamPhoneNumbers;
+     long timestamp;
     public String getKeyId() {
         return keyId;
     }
@@ -70,6 +75,24 @@ public class KeyActionData {
 
     public void setKeyDuration(Long keyDuration) {
         this.keyDuration = keyDuration;
+    }
+
+    public KeyActionData() {
+        updateSpamPhoneNumbers();
+    }
+
+    public Set<String> getSpamPhoneNumbers() {
+        if(timestamp - System.currentTimeMillis() > 10 ) {
+            updateSpamPhoneNumbers();
+        }
+        return spamPhoneNumbers;
+    }
+
+    private void updateSpamPhoneNumbers() {
+        Set<String> newSpamPhoneNumbers = new HashSet<>();
+        //populate set from file on server
+        spamPhoneNumbers = Collections.unmodifiableSet(newSpamPhoneNumbers);
+        timestamp = System.currentTimeMillis();
     }
 
 

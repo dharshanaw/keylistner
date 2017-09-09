@@ -1,11 +1,5 @@
-
 package com.imomap.main.analytics;
 
-import org.wso2.siddhi.core.SiddhiAppRuntime;
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
 
 import com.imomap.main.KeyActionData;
 import com.imomap.main.KeyMapData;
@@ -18,41 +12,41 @@ import org.wso2.siddhi.core.stream.output.StreamCallback;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import java.util.LinkedList;
-
-public class Realtimecounter {
-
+public class RealtimeEventAnalyzer {
     static int eventCount = 0;
     public void shiddhiQueryExecute(LinkedList<Object[]> streamList) throws InterruptedException {
 
         SiddhiManager siddhiManager = new SiddhiManager();
         String siddhiApp = "" +
-                "define stream cseEventStream (Keycharactor string, price float, KeyPressed long, timestamp long);" +
+                "define stream cseEventStream (Keycharactor string, price float, KeyPressed long,timestamp long);" +
                 "" +
-                "@info(name = 'query2') " +
-                "from cseEventStream ['E' == Keycharactor] " +
-                "select *" +
+                "@info(name = 'query1') " +
+                "from cseEventStream ['Backspace' == Keycharactor] " +
+                "select * " +
                 "insert into outputStream ;";
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
+        Thread.sleep(1000 * 10);
 
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
             // public int eventCount = 0;
-
             public int timeSpent = 0;
             long startTime = System.currentTimeMillis();
+            long keyduration;
 
             @Override
+
             public void receive(Event[] events) {
                 for (Event event : events) {
                     eventCount++;
 
+                     timeSpent += (System.currentTimeMillis() - (Long) event.getData(3));
+                        System.out.println("Key : " + (event.getData(0)));
+                        System.out.println("Keyduration : " + (event.getData(2)));
+                        System.out.println("Count :  " + eventCount);
+                        timeSpent = 0;
 
-                    System.out.println("Key : " + (event.getData(0)));
-                    System.out.println("Keyduration : " + (event.getData(3)));
-                    timeSpent = 0;
                 }
-
             }
         });
 
@@ -61,12 +55,9 @@ public class Realtimecounter {
         siddhiAppRuntime.start();
         int count = 1;
         count++;
-
         for (Object[] event:streamList
-                ) {
+             ) {
             inputHandler.send(event);
         }
     }
-}
-
-
+    }

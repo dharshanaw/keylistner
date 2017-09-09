@@ -1,18 +1,23 @@
 
 package com.imomap.main;
 
+import com.imomap.main.analytics.KeyAggregateInfoReader;
+import com.imomap.main.analytics.RealtimeEventAnalyzer;
+import com.imomap.main.analytics.Realtimecounter;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.UUID;
 
 
 public class KeyListner implements NativeKeyListener {
-
     int Count = 0;
+    KeyAggregateInfoReader kl = new KeyAggregateInfoReader();
+
     HashMap<String, KeyMapData> keyPressedEventMap;
     HashMap<String, KeyMapData> keyRelesedEventMap;
     HashMap<String, KeyMapData> keyTypedEventMap;
@@ -20,7 +25,8 @@ public class KeyListner implements NativeKeyListener {
     String uniqueID;
     String currentKeyPressed;
 
-    KeyListner() {
+
+    public KeyListner() {
         keyPressedEventMap = new HashMap<String, KeyMapData>();
         keyRelesedEventMap = new HashMap<String, KeyMapData>();
         keyTypedEventMap = new HashMap<String, KeyMapData>();
@@ -30,14 +36,15 @@ public class KeyListner implements NativeKeyListener {
 
     public void nativeKeyPressed(NativeKeyEvent e) {
         uniqueID = UUID.randomUUID().toString();
-        System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
+        System.out.println("Key Pressed: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
         KeyMapData keyMapData = new KeyMapData();
         keyMapData.setAction(KeyActions.KEY_PRESSES.toString());
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
         keyMapData.setTimestamp(System.currentTimeMillis());
         currentKeyPressed = NativeKeyEvent.getKeyText(e.getKeyCode());
-        this.getKeyAggrigatedInfo(keyMapData);
+            this.getKeyAggrigatedInfo(keyMapData);
+
     }
 
     public void nativeKeyReleased(NativeKeyEvent e) {
@@ -57,6 +64,7 @@ public class KeyListner implements NativeKeyListener {
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
         keyMapData.setTimestamp(System.currentTimeMillis());
+
         this.getKeyAggrigatedInfo(keyMapData);
 
     }
@@ -71,9 +79,10 @@ public class KeyListner implements NativeKeyListener {
         } else {
             return;
         }
+
         Runnable task = () -> {
             KeyActionData actionData = new KeyActionData();
-            System.out.println("Hello " + keyPressedEventMap.values().size());
+            KeyActionData timecal = new KeyActionData();
             Object[] uuidArray = keyPressedEventMap.keySet().toArray();
             for (int a = 0; a <= uuidArray.length - 1; a++) {
                 KeyMapData keyPressedData = keyPressedEventMap.get(uuidArray[a].toString());
@@ -86,22 +95,41 @@ public class KeyListner implements NativeKeyListener {
                     actionData.setKeyReleasedTime(keyRelesedData.getTimestamp());
                     actionData.setKeyDuration(keyRelesedData.getTimestamp() - keyPressedData.getTimestamp());
                     resultMap.put(uuidArray[a].toString(), actionData);
+                    KeyAggregateInfoReader infoReader = new KeyAggregateInfoReader();
+                    //infoReader.analyzeEvent(resultMap);
+                    infoReader.notifyAll();
                     keyPressedEventMap.remove(uuidArray[a].toString());
                     keyRelesedEventMap.remove(uuidArray[a].toString());
+
+
+
                 }
             }
         };
-        if (currentKeyPressed == "Enter") {
 
+
+
+        if (currentKeyPressed == "Enter") {
             task.run();
 
             Thread thread = new Thread(task);
             thread.start();
-
+            LinkedList<Object[]> streamList = new LinkedList<>();
+            resultMap.entrySet().forEach(entry -> {
+                streamList.add(new Object[]{entry.getValue().getKeyCharactor(), 75.6f, entry.getValue().getKeyDuration(), entry.getValue().getKeyReleasedTime()});
+            });
+           // RealtimeEventAnalyzer eventAnalyzer= new RealtimeEventAnalyzer();
+            Realtimecounter counter = new Realtimecounter();
+            try {
+               //eventAnalyzer.shiddhiQueryExecute(streamList);
+                counter.shiddhiQueryExecute(streamList);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.out.println("Done!");
         }
-    }
 
+        }
 
     public static void main(String[] args) {
 
@@ -114,10 +142,10 @@ public class KeyListner implements NativeKeyListener {
             System.err.println("There was a problem registering the native hook.");
             System.err.println(ex.getMessage());
             System.exit(1);
+
         }
 
         GlobalScreen.addNativeKeyListener(new KeyListner());
-
 
     }
 }
