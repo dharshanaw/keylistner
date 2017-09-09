@@ -6,22 +6,26 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.L;
-
 
 public class ResultSetWriter {
     public void writeResultSet(HashMap<String, KeyActionData> resultMap) throws SQLException {
-        for(Map.Entry<String, KeyActionData> entry : resultMap.entrySet()) {
+        for (Map.Entry<String, KeyActionData> entry : resultMap.entrySet()) {
             String key = entry.getKey();
+
             KeyActionData value = entry.getValue();
             JDBCDriverConnector.getDbCon().insert("INSERT INTO keyevents (keyId, KeyCharactor, Action, KeyPressedTime, KeyReleasedTime, KeyDuration)\n" +
-                    "VALUES ('"+value.getKeyId()+"','"+value.getKeyCharactor()+"','"+value.getAction()+"',"+value.getKeyPressedTime()+","+value.getKeyReleasedTime()+","+value.getKeyDuration()+")");
+                    "VALUES ('" + value.getKeyId() + "','" + value.getKeyCharactor() + "','" + value.getAction() + "'," + value.getKeyPressedTime() + "," + value.getKeyReleasedTime() + "," + value.getKeyDuration() + ")");
 
+            if (value.getKeyDuration() > 50) {
+                JDBCDriverConnector.getDbCon().insert("INSERT INTO Emotionanalytics (Emotionstate,)\n" +
+                        "VALUES ('" + "confused" + ")");
+
+            }
+        }
+    }
         }
 
 
-    }
-}
 
 
 

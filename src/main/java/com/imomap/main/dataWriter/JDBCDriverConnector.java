@@ -7,12 +7,13 @@ public class JDBCDriverConnector {
     public Connection conn;
     private Statement statement;
     public static JDBCDriverConnector db;
-    private JDBCDriverConnector() {
+    public JDBCDriverConnector() {
         String url= "jdbc:mysql://localhost:3308/";
         String dbName = "keytypeanalytics";
         String driver = "com.mysql.jdbc.Driver";
         String userName = "newuser";
         String password = "password";
+
         try {
             Class.forName(driver).newInstance();
             this.conn = (Connection) DriverManager.getConnection(url+dbName,userName,password);

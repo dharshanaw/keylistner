@@ -7,6 +7,18 @@
     <groupId>com.imomap</groupId>
     <artifactId>com.imomap.main</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <parent>
         <groupId>org.wso2</groupId>
         <artifactId>wso2</artifactId>
@@ -19,7 +31,77 @@
             <artifactId>jnativehook</artifactId>
             <version>2.0.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>6.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mojo.archetypes</groupId>
+            <artifactId>nbm-archetype</artifactId>
+            <version>1.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.help</groupId>
+            <artifactId>javahelp</artifactId>
+            <version>2.0.05</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>analytics</artifactId>
+            <version>4.0.0-M13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+            <version>4.0.0-M12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+            <version>4.0.0-M12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+            <version>4.0.0-M12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-core</artifactId>
+            <version>4.0.0-M12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+            <version>4.0.0-M12-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.siddhi</groupId>
+            <artifactId>siddhi-query-api</artifactId>
+            <version>4.0.0-M12-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
-
+    <properties>
+        <java.version>1.7</java.version>
+        <spring.version>4.0.3.RELEASE</spring.version>
+        <cglib.version>2.2.2</cglib.version>
+    </properties>
 </project>
