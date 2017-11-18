@@ -47,6 +47,7 @@ public class KeyListner implements NativeKeyListener {
 
     }
 
+
     public void nativeKeyReleased(NativeKeyEvent e) {
         System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
         KeyMapData keyMapData = new KeyMapData();
@@ -54,7 +55,7 @@ public class KeyListner implements NativeKeyListener {
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
         keyMapData.setTimestamp(System.currentTimeMillis());
-        this.getKeyAggrigatedInfo(keyMapData);
+       this.getKeyAggrigatedInfo(keyMapData);
     }
 
     public void nativeKeyTyped(NativeKeyEvent e) {
@@ -64,10 +65,10 @@ public class KeyListner implements NativeKeyListener {
         keyMapData.setKeyCharactor(NativeKeyEvent.getKeyText(e.getKeyCode()));
         keyMapData.setKeyId(uniqueID);
         keyMapData.setTimestamp(System.currentTimeMillis());
-
         this.getKeyAggrigatedInfo(keyMapData);
 
     }
+
 
     private void getKeyAggrigatedInfo(KeyMapData keyMapData) {
         if (keyMapData.getAction().equals(KeyActions.KEY_PRESSES.toString())) {
@@ -78,7 +79,9 @@ public class KeyListner implements NativeKeyListener {
             keyTypedEventMap.put(keyMapData.getKeyId(), keyMapData);
         } else {
             return;
-        }
+        };
+
+
 
         Runnable task = () -> {
             KeyActionData actionData = new KeyActionData();
@@ -97,40 +100,43 @@ public class KeyListner implements NativeKeyListener {
                     resultMap.put(uuidArray[a].toString(), actionData);
                     KeyAggregateInfoReader infoReader = new KeyAggregateInfoReader();
                     //infoReader.analyzeEvent(resultMap);
-                    infoReader.notifyAll();
+                  //  infoReader.notifyAll();
                     keyPressedEventMap.remove(uuidArray[a].toString());
                     keyRelesedEventMap.remove(uuidArray[a].toString());
-
-
 
                 }
             }
         };
+        if (currentKeyPressed == "Enter"){
 
-
-
-        if (currentKeyPressed == "Enter") {
             task.run();
-
             Thread thread = new Thread(task);
             thread.start();
             LinkedList<Object[]> streamList = new LinkedList<>();
             resultMap.entrySet().forEach(entry -> {
                 streamList.add(new Object[]{entry.getValue().getKeyCharactor(), 75.6f, entry.getValue().getKeyDuration(), entry.getValue().getKeyReleasedTime()});
             });
+//System.out.println(streamList.toString());
+
+
+
            // RealtimeEventAnalyzer eventAnalyzer= new RealtimeEventAnalyzer();
-            Realtimecounter counter = new Realtimecounter();
+           RealtimeEventAnalyzer counter = new RealtimeEventAnalyzer();
+
             try {
-               //eventAnalyzer.shiddhiQueryExecute(streamList);
                 counter.shiddhiQueryExecute(streamList);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("Done!");
-        }
+
+
+
+
 
         }
 
+        }
     public static void main(String[] args) {
 
         try {
