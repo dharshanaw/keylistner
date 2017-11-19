@@ -9,10 +9,10 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.UUID;
-
 
 public class KeyListner implements NativeKeyListener {
     int Count = 0;
@@ -46,8 +46,6 @@ public class KeyListner implements NativeKeyListener {
             this.getKeyAggrigatedInfo(keyMapData);
 
     }
-
-
     public void nativeKeyReleased(NativeKeyEvent e) {
         System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
         KeyMapData keyMapData = new KeyMapData();
@@ -81,15 +79,19 @@ public class KeyListner implements NativeKeyListener {
             return;
         };
 
+        if (currentKeyPressed == "Enter"){
+           // this.mappingTask();
 
 
         Runnable task = () -> {
-            KeyActionData actionData = new KeyActionData();
+            //KeyActionData actionData = new KeyActionData();
             KeyActionData timecal = new KeyActionData();
             Object[] uuidArray = keyPressedEventMap.keySet().toArray();
             for (int a = 0; a <= uuidArray.length - 1; a++) {
                 KeyMapData keyPressedData = keyPressedEventMap.get(uuidArray[a].toString());
                 if (keyRelesedEventMap.containsKey(uuidArray[a].toString())) {
+                    KeyActionData actionData = new KeyActionData();
+
                     KeyMapData keyRelesedData = keyRelesedEventMap.get(uuidArray[a].toString());
                     actionData.setAction(keyPressedData.getAction());
                     actionData.setKeyCharactor(keyPressedData.getKeyCharactor());
@@ -107,32 +109,26 @@ public class KeyListner implements NativeKeyListener {
                 }
             }
         };
-        if (currentKeyPressed == "Enter"){
 
             task.run();
             Thread thread = new Thread(task);
             thread.start();
             LinkedList<Object[]> streamList = new LinkedList<>();
             resultMap.entrySet().forEach(entry -> {
-                streamList.add(new Object[]{entry.getValue().getKeyCharactor(), 75.6f, entry.getValue().getKeyDuration(), entry.getValue().getKeyReleasedTime()});
+                streamList.add(new Object[]{entry.getKey(),entry.getValue().getKeyCharactor(), 75.6f, entry.getValue().getKeyDuration(), entry.getValue().getKeyReleasedTime()});
             });
 //System.out.println(streamList.toString());
 
-
-
-           // RealtimeEventAnalyzer eventAnalyzer= new RealtimeEventAnalyzer();
-           RealtimeEventAnalyzer counter = new RealtimeEventAnalyzer();
+            Realtimecounter eventAnalyzer= new Realtimecounter();
+            //RealtimeEventAnalyzer counter = new RealtimeEventAnalyzer();
 
             try {
-                counter.shiddhiQueryExecute(streamList);
+
+                eventAnalyzer.shiddhiQueryExecute(streamList);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-
-
-
 
         }
 
@@ -140,6 +136,7 @@ public class KeyListner implements NativeKeyListener {
     public static void main(String[] args) {
 
         try {
+
 
             GlobalScreen.registerNativeHook();
 
@@ -153,5 +150,31 @@ public class KeyListner implements NativeKeyListener {
 
         GlobalScreen.addNativeKeyListener(new KeyListner());
 
+    }
+
+private  void mappingTask(){
+        KeyActionData actionData = new KeyActionData();
+        Object[] uuidArray = keyPressedEventMap.keySet().toArray();
+        HashMap<String,KeyActionData> resultHashmap = new HashMap<>();
+    for (int a = 0; a <= uuidArray.length - 1; a++) {
+            KeyMapData keyPressedData = keyPressedEventMap.get(uuidArray[a].toString());
+            if (keyRelesedEventMap.containsKey(uuidArray[a].toString())) {
+                KeyMapData keyRelesedData = keyRelesedEventMap.get(uuidArray[a].toString());
+                actionData.setAction(keyPressedData.getAction());
+                actionData.setKeyCharactor(keyPressedData.getKeyCharactor());
+                actionData.setKeyId(keyPressedData.getKeyId());
+                actionData.setKeyPressedTime(keyPressedData.getTimestamp());
+                actionData.setKeyReleasedTime(keyRelesedData.getTimestamp());
+                actionData.setKeyDuration(keyRelesedData.getTimestamp() - keyPressedData.getTimestamp());
+                resultMap.put(uuidArray[a].toString(), actionData);
+                KeyAggregateInfoReader infoReader = new KeyAggregateInfoReader();
+                //infoReader.analyzeEvent(resultMap);
+                //  infoReader.notifyAll();
+    //            keyPressedEventMap.remove(uuidArray[a].toString());
+      //          keyRelesedEventMap.remove(uuidArray[a].toString());
+
+            }
+        }
+    //StaticHashmap.setHashMap(resultHashmap);
     }
 }
