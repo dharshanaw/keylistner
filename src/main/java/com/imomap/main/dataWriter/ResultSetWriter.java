@@ -16,6 +16,7 @@ public class ResultSetWriter {
             JDBCDriverConnector.getDbCon().insert("INSERT INTO keyevents (keyId, KeyCharactor, Action, KeyPressedTime, KeyReleasedTime, KeyDuration)\n" +
                     "VALUES ('" + value.getKeyId() + "','" + value.getKeyCharactor() + "','" + value.getAction() + "'," + value.getKeyPressedTime() + "," + value.getKeyReleasedTime() + "," + value.getKeyDuration() + ")");
 
+
             if (value.getKeyDuration() > 50) {
                 JDBCDriverConnector.getDbCon().insert("INSERT INTO Emotionanalytics (Emotionstate,)\n" +
                         "VALUES ('" + "confused" + ")");
