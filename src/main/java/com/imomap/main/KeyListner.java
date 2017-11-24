@@ -4,6 +4,7 @@ package com.imomap.main;
 import com.imomap.main.analytics.KeyAggregateInfoReader;
 import com.imomap.main.analytics.RealtimeEventAnalyzer;
 import com.imomap.main.analytics.Realtimecounter;
+import com.imomap.main.analytics.Realtimeduration;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -24,6 +25,7 @@ public class KeyListner implements NativeKeyListener {
     volatile HashMap<String, KeyActionData> resultMap;
     String uniqueID;
     String currentKeyPressed;
+
 
 
     public KeyListner() {
@@ -66,6 +68,7 @@ public class KeyListner implements NativeKeyListener {
         this.getKeyAggrigatedInfo(keyMapData);
 
     }
+
 
 
     private void getKeyAggrigatedInfo(KeyMapData keyMapData) {
@@ -115,16 +118,22 @@ public class KeyListner implements NativeKeyListener {
             thread.start();
             LinkedList<Object[]> streamList = new LinkedList<>();
             resultMap.entrySet().forEach(entry -> {
-                streamList.add(new Object[]{entry.getKey(),entry.getValue().getKeyCharactor(), 75.6f, entry.getValue().getKeyDuration(), entry.getValue().getKeyReleasedTime()});
+                streamList.add(new Object[]{entry.getKey(),entry.getValue().getKeyCharactor(), entry.getValue().getKeyDuration(), entry.getValue().getKeyReleasedTime()});
             });
 //System.out.println(streamList.toString());
 
-            Realtimecounter eventAnalyzer= new Realtimecounter();
-            //RealtimeEventAnalyzer counter = new RealtimeEventAnalyzer();
+          //  Realtimecounter eventAnalyzer= new Realtimecounter();
+
+            Realtimeduration  duratation = new Realtimeduration();
+
+            Realtimecounter counter = new Realtimecounter();
 
             try {
 
-                eventAnalyzer.shiddhiQueryExecute(streamList);
+
+
+               counter.shiddhiQueryExecute(streamList);
+                duratation.shiddhiQueryExecute(streamList);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

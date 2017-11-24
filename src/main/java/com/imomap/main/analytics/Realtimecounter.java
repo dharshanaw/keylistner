@@ -21,16 +21,12 @@ import java.util.LinkedList;
 
 import java.util.LinkedList;
 
-
-
-
 public class Realtimecounter {
 
     static int eventCount = 0;
     public void shiddhiQueryExecute(LinkedList<Object[]> streamList) throws InterruptedException {
 
         SiddhiManager siddhiManager = new SiddhiManager();
-
 
  /* String siddhiApp = "define table counterTable (KeyId int, KeyCharactor String, keyCount long);" +
 
@@ -46,24 +42,28 @@ public class Realtimecounter {
                 "insert into outputStream;"; */
 
         String siddhiApp = "" +
-                "define table counterTable (keyCount long);" +
-                "define stream cseEventStream (KeyId String,Keycharactor string, Key String, getKeyDuration float,KeyReleasedTime long);" +
+                "define table counterTable (keyCount long );" +
+                "define stream cseEventStream (KeyId String,Keycharactor string, getKeyDuration long,KeyReleasedTime long);" +
                 "@info(name='counting allValues')\n" +
                 "from cseEventStream ['Backspace' == Keycharactor] " +
                 "select count(Keycharactor) as keyCount\n" +
                 "insert into counterTable;"+
+
+
         "@info(name='processing allValues')\n" +
         "from cseEventStream JOIN counterTable\n" +
                 "select *" +
                 "insert into outputStream;";
-//
+
+
 //                "define stream cseEventStream (Keycharactor string, price float, KeyDuration long ,KeyReleasedTime long);" +
 //                "define table counterTable (keyCount int);" +
 //                "" +
 //                "@info(name = 'query1') " +
 //                "from cseEventStream['Backspace' == Keycharactor] " +
 //                "select count(Keycharactor) as keyCount\n" +
-//
+
+
 //                "from cseEventStream join counterTable"+
 //        "on counterTable.Keycharactor == cseEventStream.Keycharactor"+
 //
@@ -78,13 +78,15 @@ public class Realtimecounter {
 
         SiddhiAppRuntime siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(siddhiApp);
 
-
         siddhiAppRuntime.addCallback("outputStream", new StreamCallback() {
 
             @Override
             public void receive(Event[] events) {
+                System.out.println("Key :################################################ ");
+                System.out.println( events.length);
                 for (Event event : events) {
                     // eventCount++;
+                    System.out.println("Key :################################################ ");
                     System.out.println("Key : " + (event.getData(0)));
                     System.out.println("Keyduration : " + (event.getData(3)));
                     System.out.println("Keypress : " + (event.getData(2)));
@@ -101,9 +103,12 @@ public class Realtimecounter {
 
         int count = 1;
                 // count++;
+
                 for (Object[] event:streamList
                         ) {
+
                     inputHandler.send(event);
+
                 }
 
                 siddhiAppRuntime.shutdown();
@@ -111,3 +116,4 @@ public class Realtimecounter {
 
             }
         }
+
